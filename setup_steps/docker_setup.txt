@@ -1,0 +1,94 @@
+docker volume create clickhouse-data
+docker volume create minio_data
+
+docker run -d --name minio \
+  -p 9001:9001 -p 9000:9000 \
+  -e "MINIO_ROOT_USER=minioadmin" \
+  -e "MINIO_ROOT_PASSWORD=minioadmin123" \
+  -v  minio_data:/data \
+  quay.io/minio/minio server /data --console-address ":9001"
+
+then login to 
+http://localhost:9001
+and create a bucket called clickhouse
+
+
+docker run -d \
+  --name clickhouse-server \
+  -p 8123:8123  \
+  -e CLICKHOUSE_USER=myuser \
+  -e CLICKHOUSE_PASSWORD=mypassword \
+  -e CLICKHOUSE_DB=mydatabase \
+  -v "$(pwd)/storage_with_s3.xml":/etc/clickhouse-server/config.d/storage_with_s3.xml \
+  -v clickhouse-data:/var/lib/clickhouse \
+  clickhouse/clickhouse-server
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+NON s3 TEST table ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CREATE TABLE test_table
+(
+    id UInt32,
+    name String
+)
+ENGINE = MergeTree()
+ORDER BY id
+
+
+INSERT INTO test_table VALUES (1, 'test');
+
+select * from test_table;
+
+show tables;
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+s3 TEST table ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CREATE TABLE s3_test_table
+(
+    id UInt32,
+    name String,
+    timestamp DateTime
+)
+ENGINE = MergeTree()
+ORDER BY id
+SETTINGS storage_policy = 's3_only';
+
+
+INSERT INTO s3_test_table (id, name, timestamp) VALUES 
+(1, 'Alice', now()),
+(2, 'Bob', now() - INTERVAL 1 DAY),
+(3, 'Charlie', now() - INTERVAL 2 DAY);
+
+select * from s3_test_table
+
+show tables
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+connect from terminal
+curl -v http://localhost:8123 -u myuser:mypassword
+
+curl "http://localhost:8123?query=SHOW+TABLES" -u myuser:mypassword
+
+DESKTOP-CGVIE05% curl "http://localhost:8123?query=SHOW+DATABASES;" -u myuser:mypassword
+
+INFORMATION_SCHEMA
+default
+information_schema
+system
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+Close down ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+docker rm -f clickhouse-server  
+docker rm -f minio  
+
+
+docker volume rm clickhouse-data
+docker volume rm minio_data

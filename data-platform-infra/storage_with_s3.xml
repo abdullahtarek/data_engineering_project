@@ -1,0 +1,44 @@
+<clickhouse>
+  <storage_configuration>
+    <disks>
+      <!-- S3 Storage -->
+      <s3_disk>
+        <type>s3</type>
+        <endpoint>http://minio:9000/clickhouse/</endpoint>
+        <access_key_id>minioadmin</access_key_id>
+        <secret_access_key>minioadmin123</secret_access_key>
+      </s3_disk>
+
+      <!-- Local cache disk -->
+      <local_cache>
+        <type>local</type>
+        <path>/var/lib/clickhouse/disks/local_cache/</path>
+      </local_cache>
+
+    </disks>
+
+    <policies>
+      <!-- S3 Storage policy-->
+      <s3_only>
+        <volumes>
+          <main>
+            <disk>s3_disk</disk>
+          </main>
+        </volumes>
+      </s3_only>
+      
+      <!-- S3 with Cache Storage policy-->
+      <s3_with_cache>
+        <volumes>
+          <main>
+            <disk>local_cache</disk>
+            <disk>s3_disk</disk>
+          </main>
+        </volumes>
+        <move_factor>0.1</move_factor>
+        <prefer_not_to_merge>true</prefer_not_to_merge>
+      </s3_with_cache>
+
+    </policies>
+  </storage_configuration>
+</clickhouse>

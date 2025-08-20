@@ -1,0 +1,43 @@
+use python 3.12.6 --latest stable version
+
+
+sudo apt update
+sudo apt install -y build-essential gcc python3-dev
+
+pip install dbt-core dbt-clickhouse
+
+---
+setup DBT 
+
+dbt init clickhouse_dbt
+
+check if this dir exits
+~/.dbt
+if not
+mkdir ~/.dbt
+
+vim 
+~/.dbt/profiles.yml
+
+clickhouse_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      schema: mydatabase
+      host: localhost        # or your ClickHouse server
+      port: 8123             # default HTTP port
+      user: myuser
+      password: mypassword
+      secure: False          # set True if using HTTPS
+      verify: False
+      database: mydatabase
+
+
+
+in vscode
+install dbt extention
+
+=========================
+RUN DBT
+dbt build --select +number_of_users.sql
