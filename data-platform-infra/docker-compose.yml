@@ -56,6 +56,12 @@ services:
         condition: service_healthy
       create-bucket:
         condition: service_completed_successfully
+    entrypoint: >
+      sh -c "
+      mkdir -p /var/lib/clickhouse/disks/s3_disk &&
+      chown -R clickhouse:clickhouse /var/lib/clickhouse &&
+      exec /entrypoint.sh
+      "
 
 volumes:
   clickhouse-data:

@@ -75,7 +75,7 @@ curl -v http://localhost:8123 -u myuser:mypassword
 
 curl "http://localhost:8123?query=SHOW+TABLES" -u myuser:mypassword
 
-DESKTOP-CGVIE05% curl "http://localhost:8123?query=SHOW+DATABASES;" -u myuser:mypassword
+curl "http://localhost:8123?query=SHOW+DATABASES;" -u myuser:mypassword
 
 INFORMATION_SCHEMA
 default

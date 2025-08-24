@@ -60,6 +60,38 @@ show tables
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+OR TERMINAL Commands :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+curl "http://localhost:8123/?database=mydatabase" \
+      -u myuser:mypassword \
+      --data-binary "CREATE TABLE s3_test_table
+ (
+     id UInt32,
+     name String,
+     timestamp DateTime
+ )
+ ENGINE = MergeTree()
+ ORDER BY id
+ SETTINGS storage_policy = 's3_only';"
+
+
+
+curl -v "http://localhost:8123/?database=mydatabase" \
+  -u myuser:mypassword \
+  -d "INSERT INTO s3_test_table (id, name, timestamp) VALUES
+      (1, 'Alice', now()),
+      (2, 'Bob', now() - INTERVAL 1 DAY),
+      (3, 'Charlie', now() - INTERVAL 2 DAY)"
+
+
+curl "http://localhost:8123/?database=mydatabase&query=SELECT+*+FROM+s3_test_table" \
+  -u myuser:mypassword
+
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 s3 with cache TEST table ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CREATE TABLE s3_test_table_with_cache
