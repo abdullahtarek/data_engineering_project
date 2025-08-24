@@ -1,5 +1,25 @@
 version: '3.8'
 
+
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:2.9.0
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__FERNET_KEY: "5wjV7NcWPsf47L-z2dMM6EAKqdZF3a2442BqrHiAdWE="
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+  volumes:
+    - ./git-data/repo/data-pipelines/dags:/opt/airflow/dags
+    - ./git-data/repo/data-pipelines/clickhouse_dbt:/opt/airflow/dbt
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - default
+
+
 services:
   minio:
     image: quay.io/minio/minio
@@ -63,6 +83,77 @@ services:
       exec /entrypoint.sh
       "
 
+
+  # -------------------
+  # Database for Airflow
+  # -------------------
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # -------------------
+  # Airflow Services
+  # -------------------
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db init &&
+        airflow users create \
+          --username admin \
+          --firstname Airflow \
+          --lastname Admin \
+          --role Admin \
+          --email admin@example.com \
+          --password admin
+    restart: on-failure
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: always
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    restart: always
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    restart: always
+
+  # -------------------
+  # Git Sync (DAGs + DBT)
+  # -------------------
+  git-sync:
+    image: k8s.gcr.io/git-sync/git-sync:v4.0.0
+    restart: always
+    volumes:
+      - ./git-data:/git-data
+    environment:
+      - GIT_SYNC_REPO=https://github.com/abdullahtarek/data_engineering_project.git
+      - GIT_SYNC_BRANCH=main
+      - GIT_SYNC_ROOT=/git-data
+      - GIT_SYNC_DEST=repo
+      - GIT_SYNC_WAIT=60
+
+
 volumes:
   clickhouse-data:
   minio_data:
+  git-data:
+  postgres_data:
