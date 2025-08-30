@@ -48,6 +48,7 @@ with DAG(
     task1 = BashOperator(
         task_id='number_of_users',
         bash_command="""source {0}/bin/activate &&
+        export PYTHONUNBUFFERED=1 &&
         cd {1}/../clickhouse_dbt/ && 
         dbt build --select +number_of_users.sql
         """.format(
