@@ -85,8 +85,13 @@ curl -v "http://localhost:8123/?database=mydatabase" \
       (3, 'Charlie', now() - INTERVAL 2 DAY)"
 
 
-curl "http://localhost:8123/?database=mydatabase&query=SELECT+*+FROM+s3_test_table" \
-  -u myuser:mypassword
+curl -v "http://localhost:8123/?database=mydatabase" \
+  -u myuser:mypassword \
+  -d "INSERT INTO s3_test_table (id, name, timestamp) VALUES
+      (4, 'Adam', now())"
+
+
+curl "http://localhost:8123/?database=mydatabase&query=SELECT+*+FROM+s3_test_table" -u myuser:mypassword
 
 
 

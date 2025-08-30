@@ -13,6 +13,8 @@ x-airflow-common:
   volumes:
     - ./git-data/repo/data-pipelines/dags:/opt/airflow/dags
     - ./git-data/repo/data-pipelines/clickhouse_dbt:/opt/airflow/dbt
+    - ./logs:/opt/airflow/logs 
+    - ~/.dbt:/home/airflow/.dbt
   depends_on:
     postgres:
       condition: service_healthy
@@ -142,12 +144,13 @@ services:
   git-sync:
     image: k8s.gcr.io/git-sync/git-sync:v4.0.0
     restart: always
+    user: "0:0"  
     volumes:
-      - ./git-data:/git-data
+      - ./git-data:/git
     environment:
       - GIT_SYNC_REPO=https://github.com/abdullahtarek/data_engineering_project.git
       - GIT_SYNC_BRANCH=main
-      - GIT_SYNC_ROOT=/git-data
+      - GIT_SYNC_ROOT=/git
       - GIT_SYNC_DEST=repo
       - GIT_SYNC_WAIT=60
 
@@ -157,3 +160,4 @@ volumes:
   minio_data:
   git-data:
   postgres_data:
+  logs:

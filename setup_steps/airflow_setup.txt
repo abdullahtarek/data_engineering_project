@@ -1,0 +1,19 @@
+
+Chat GPT with the necessary docker-compose
+https://chatgpt.com/share/68a59250-bad8-8013-a56c-1f9191f4a2b1
+
+
+==========================
+For the key of cryptogtaphy for fernet.
+
+pip3 install cryptography
+
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+copy whatever you get and paste it in AIRFLOW__CORE__FERNET_KEY in x-airflow-common
+
+=========================
+FORRRRR import airflow
+pip3 install apache-airflow
+
+FORRRR from airflow.operators.python
+
