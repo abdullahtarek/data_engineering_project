@@ -13,6 +13,7 @@ default_args = {
     'retries': 0,
 }
 
+# Define paths
 python_env = "/home/dbtEnv"
 requirements_file = os.path.join(folder_path,"../dbt_requirements.txt")
 
