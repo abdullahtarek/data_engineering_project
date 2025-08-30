@@ -14,7 +14,7 @@ default_args = {
 }
 
 # Define paths
-python_env = "/home/dbtEnv"
+python_env = "dbtEnv"
 requirements_file = os.path.join(folder_path,"../dbt_requirements.txt")
 
 with DAG(
