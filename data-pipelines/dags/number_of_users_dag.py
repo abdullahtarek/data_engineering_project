@@ -14,7 +14,7 @@ default_args = {
 }
 
 # Define paths
-python_env = "dbtEnv"
+python_env =  os.path.join(folder_path,"../dbtEnv") 
 requirements_file = os.path.join(folder_path,"dbt_requirements.txt")
 python_path_binary = f"{python_env}/bin/python"
 
