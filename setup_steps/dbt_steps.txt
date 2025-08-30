@@ -16,8 +16,7 @@ check if this dir exits
 if not
 mkdir ~/.dbt
 
-vim 
-~/.dbt/profiles.yml
+vim ~/.dbt/profiles.yml
 
 clickhouse_dbt:
   target: dev

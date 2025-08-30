@@ -40,14 +40,13 @@ with DAG(
 
         echo "Installing requirements from {requirements_file}"
         {python_env}/bin/pip install -r {requirements_file}
-        """,
-        dag=dag,
+        """
     )
 
 
     task1 = BashOperator(
         task_id='number_of_users',
-        python_callable='echo "Hello world" ',
+        bash_command='echo "Hello world" ',
     )
 
     setup_environment >> task1

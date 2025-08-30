@@ -13,7 +13,7 @@ x-airflow-common:
   volumes:
     - ./git-data/repo/data-pipelines/dags:/opt/airflow/dags
     - ./git-data/repo/data-pipelines/clickhouse_dbt:/opt/airflow/dbt
-    - ./logs:/opt/airflow/logs 
+    - logs:/opt/airflow/logs 
     - ~/.dbt:/home/airflow/.dbt
   depends_on:
     postgres:
