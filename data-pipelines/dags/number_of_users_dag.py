@@ -12,7 +12,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id='hello_world_dag',
+    dag_id='number_of_users_dag',
     default_args=default_args,
     description='A simple DAG that prints Hello World every 5 minutes',
     schedule_interval='*/5 * * * *',  # every 5 minutes
@@ -22,7 +22,7 @@ with DAG(
 ) as dag:
 
     task1 = BashOperator(
-        task_id='print_hello',
+        task_id='number_of_users',
         python_callable='echo "Hello world" ',
     )
 
