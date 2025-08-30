@@ -10,9 +10,9 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/git_repo/repo/data-pipelines/dags
   volumes:
-    - ./git-data/repo/data-pipelines/dags:/opt/airflow/dags
-    - ./git-data/repo/data-pipelines/clickhouse_dbt:/opt/airflow/dbt
+    - git-data:/opt/airflow/git_repo/
     - logs:/opt/airflow/logs 
     - ./secrets/dbt:/home/airflow/.dbt
   depends_on:
@@ -146,7 +146,7 @@ services:
     restart: always
     user: "0:0"  
     volumes:
-      - ./git-data:/git
+      - git-data:/git
     environment:
       - GIT_SYNC_REPO=https://github.com/abdullahtarek/data_engineering_project.git
       - GIT_SYNC_BRANCH=main

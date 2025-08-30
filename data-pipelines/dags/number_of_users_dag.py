@@ -15,7 +15,7 @@ default_args = {
 
 # Define paths
 python_env =  "/opt/airflow/dbtEnv"
-requirements_file = os.path.join(folder_path,"dbt_requirements.txt")
+requirements_file = os.path.join(folder_path,"../dbt_env_requirements.txt")
 python_path_binary = f"{python_env}/bin/python"
 
 with DAG(
@@ -48,7 +48,7 @@ with DAG(
     task1 = BashOperator(
         task_id='number_of_users',
         bash_command="""source {0}/bin/activate &&
-        cd {1}/../dbt/ && 
+        cd {1}/../clickhouse_dbt/ && 
         dbt build --select +number_of_users.sql
         """.format(
         python_env,
