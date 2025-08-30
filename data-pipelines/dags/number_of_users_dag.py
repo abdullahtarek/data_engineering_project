@@ -48,7 +48,7 @@ with DAG(
     task1 = BashOperator(
         task_id='number_of_users',
         bash_command="""source {0}/bin/activate &&
-        cd {1}../dbt/ && 
+        cd {1}/../dbt/ && 
         dbt build --select +number_of_users.sql
         """.format(
         python_env,
