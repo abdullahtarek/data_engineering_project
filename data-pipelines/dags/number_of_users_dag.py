@@ -16,6 +16,7 @@ default_args = {
 # Define paths
 python_env = "dbtEnv"
 requirements_file = os.path.join(folder_path,"dbt_requirements.txt")
+python_path_binary = f"{python_env}/bin/python"
 
 with DAG(
     dag_id='number_of_users_dag',
@@ -46,7 +47,13 @@ with DAG(
 
     task1 = BashOperator(
         task_id='number_of_users',
-        bash_command='echo "Hello world" ',
+        bash_command="""source {0}/bin/activate &&
+        cd {1}../dbt/ && 
+        dbt build --select +number_of_users.sql
+        """.format(
+        python_env,
+        folder_path
+    ),
     )
 
     setup_environment >> task1
